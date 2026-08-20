@@ -171,6 +171,7 @@ dialog::backdrop { background: rgba(20,31,26,.5); backdrop-filter: blur(2px); }
 .exception-types input { position: absolute; opacity: 0; }
 .exception-types span { min-height: 47px; display: grid; place-items: center; color: var(--muted); background: white; border: 1.5px solid var(--line); border-radius: 13px; font-size: .8rem; font-weight: 780; }
 .exception-types input:checked + span { color: var(--green); background: var(--green-soft); border-color: #9fc9b9; }
+.exception-types input:checked + span::before { content: "✓"; margin-right: 6px; font-weight: 900; }
 .reason-label { display: block; margin: 15px 0 7px; font-size: .73rem; font-weight: 780; }
 .exception-dialog textarea { width: 100%; min-height: 94px; padding: 12px; margin-bottom: 13px; resize: vertical; color: var(--ink); background: white; border: 1.5px solid var(--line); border-radius: 13px; outline: none; }
 

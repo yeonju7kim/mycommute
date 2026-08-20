@@ -367,7 +367,11 @@
     $("#qr-share").addEventListener("click", shareQr);
 
     const exceptionDialog = $("#exception-dialog");
-    $("#exception-open").addEventListener("click", () => exceptionDialog.showModal());
+    $("#exception-open").addEventListener("click", () => {
+      $$('input[name="exception-type"]').forEach((input) => { input.checked = false; });
+      $("#exception-reason").value = "";
+      exceptionDialog.showModal();
+    });
     $("#exception-close").addEventListener("click", () => exceptionDialog.close());
     $("#exception-form").addEventListener("submit", async (event) => {
       event.preventDefault();

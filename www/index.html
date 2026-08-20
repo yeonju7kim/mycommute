@@ -102,7 +102,7 @@
             <button class="save-button" type="submit">설정 저장</button>
           </form>
           <button id="settings-qr-open" class="outline-button" type="button">출근 · 퇴근 · 헬스장 QR 보기</button>
-          <p class="privacy-note">모든 기록은 이 기기에만 저장돼요. · v1.3</p>
+          <p class="privacy-note">모든 기록은 이 기기에만 저장돼요. · v1.4</p>
         </section>
       </main>
 
@@ -127,8 +127,8 @@
         <div class="dialog-head"><div><p>벌금 없이 쉬어가기</p><h2>오늘 예외 처리</h2></div><button id="exception-close" type="button" aria-label="닫기">×</button></div>
         <p class="dialog-help">예외로 처리할 항목과 사유를 남겨주세요. 이미 생긴 벌금도 취소돼요.</p>
         <div class="exception-types">
-          <label><input name="exception-type" value="checkin" type="checkbox" checked /><span>출근</span></label>
-          <label><input name="exception-type" value="checkout" type="checkbox" checked /><span>퇴근</span></label>
+          <label><input name="exception-type" value="checkin" type="checkbox" /><span>출근</span></label>
+          <label><input name="exception-type" value="checkout" type="checkbox" /><span>퇴근</span></label>
         </div>
         <label class="reason-label" for="exception-reason">사유</label>
         <textarea id="exception-reason" maxlength="100" placeholder="예: 휴가, 출장, 병원" required></textarea>
