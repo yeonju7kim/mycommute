@@ -2,12 +2,43 @@
   "use strict";
 
   const L = globalThis.CommuteLogic;
-  const nativePlugin = globalThis.Capacitor?.registerPlugin ? globalThis.Capacitor.registerPlugin("Commute") : null;
   const STORAGE_KEY = "time-is-money-state-v1";
   const typeLabels = { checkin: "출근", checkout: "퇴근", gym: "헬스장" };
   let state = null;
   let historyCursor = new Date();
   let toastTimer = null;
+  let pendingNativeScan = null;
+
+  function nativeBridge() {
+    return globalThis.TimeMoneyNative || null;
+  }
+
+  function parseNativeResult(value) {
+    return typeof value === "string" ? JSON.parse(value) : value;
+  }
+
+  globalThis.__timeMoneyNativeScanResult = (result) => {
+    if (!pendingNativeScan) return;
+    const resolve = pendingNativeScan;
+    pendingNativeScan = null;
+    resolve(parseNativeResult(result));
+  };
+
+  function scanWithNative(bridge) {
+    return new Promise((resolve) => {
+      if (pendingNativeScan) {
+        resolve({ outcome: "busy" });
+        return;
+      }
+      pendingNativeScan = resolve;
+      try {
+        bridge.scanQr();
+      } catch (error) {
+        pendingNativeScan = null;
+        resolve({ outcome: "error", message: String(error?.message || error) });
+      }
+    });
+  }
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -71,22 +102,26 @@
 
   const service = {
     async getState() {
-      if (nativePlugin) return nativePlugin.getState();
+      const bridge = nativeBridge();
+      if (bridge) return parseNativeResult(bridge.getState());
       return reconcileFallback(loadFallback());
     },
     async scan() {
-      if (nativePlugin) return nativePlugin.scanQr();
-      return { outcome: "browser", state: await this.getState() };
+      const bridge = nativeBridge();
+      if (bridge) return scanWithNative(bridge);
+      return { outcome: "bridge-missing", state: await this.getState() };
     },
     async saveSettings(settings) {
-      if (nativePlugin) return nativePlugin.saveSettings(settings);
+      const bridge = nativeBridge();
+      if (bridge) return parseNativeResult(bridge.saveSettings(JSON.stringify(settings)));
       const data = loadFallback();
       data.settings = normalizedSettings(settings);
       saveFallback(data);
       return { state: reconcileFallback(data) };
     },
     async addException(types, reason) {
-      if (nativePlugin) return nativePlugin.addException({ types, reason });
+      const bridge = nativeBridge();
+      if (bridge) return parseNativeResult(bridge.addException(JSON.stringify({ types, reason })));
       const data = reconcileFallback(loadFallback());
       const date = L.dateKey();
       const time = L.timeText();
@@ -237,7 +272,9 @@
     if (result.outcome === "inactive") return "오늘은 출퇴근 체크 요일이 아니에요.";
     if (result.outcome === "unknown") return "이 앱에서 만든 QR 코드가 아니에요.";
     if (result.outcome === "cancelled") return "스캔을 취소했어요.";
-    if (result.outcome === "browser") return "QR 스캔은 설치된 Android 앱에서 사용할 수 있어요.";
+    if (result.outcome === "bridge-missing") return "앱 연결을 준비하지 못했어요. 앱을 완전히 닫고 다시 열어주세요.";
+    if (result.outcome === "busy") return "이미 QR 스캐너가 열려 있어요.";
+    if (result.outcome === "error") return "스캐너를 열지 못했어요. Google Play 서비스를 확인해 주세요.";
     return "QR을 확인하지 못했어요. 다시 시도해주세요.";
   }
 
