@@ -1,0 +1,8 @@
+{
+  "appId": "com.mycommute.app",
+  "appName": "시간이 돈이다",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

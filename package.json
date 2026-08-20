@@ -1,0 +1,20 @@
+{
+  "name": "mycommute",
+  "version": "1.2.0",
+  "private": true,
+  "description": "QR로 출퇴근과 헬스장을 기록하고 월 벌금을 계산하는 오프라인 Android 앱",
+  "scripts": {
+    "generate:qrs": "node scripts/generate-qrs.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "android:sync": "npx cap sync android",
+    "android:apk": "npm run generate:qrs && npx cap sync android && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  }
+}

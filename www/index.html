@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#f8f6f0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content="QR로 출퇴근과 운동을 기록하는 벌금 관리 앱" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>시간이 돈이다</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="brand-caption">MY COMMUTE</p>
+          <h1>시간이 돈이다<span class="brand-dot">.</span></h1>
+        </div>
+        <button id="qr-open" class="qr-mini" type="button" aria-label="QR 코드 보기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM15 14h2v2h-2zM19 14h1v3h-3v3h-3v-2M19 19h1v1h-1z"/></svg>
+          QR 보기
+        </button>
+      </header>
+
+      <main>
+        <section id="screen-home" class="screen active">
+          <div class="hero-copy">
+            <p id="today-date" class="date-line"></p>
+            <h2>오늘도 제시간에<br /><em>잘 다녀와요.</em></h2>
+          </div>
+
+          <div id="offday-note" class="offday-note hidden">오늘은 출퇴근 체크 요일이 아니에요. 운동 기록은 가능해요.</div>
+
+          <div class="status-stack">
+            <article id="checkin-card" class="status-card">
+              <div class="status-icon checkin"><svg viewBox="0 0 24 24"><path d="M4 20h16M7 20V7l10-3v16M11 12h3M11 16h3M4 9h3"/></svg></div>
+              <div class="status-copy"><span>출근</span><strong id="checkin-state">대기 중</strong><small id="checkin-detail">09:00까지</small></div>
+              <span id="checkin-badge" class="status-badge waiting">대기</span>
+            </article>
+            <article id="checkout-card" class="status-card">
+              <div class="status-icon checkout"><svg viewBox="0 0 24 24"><path d="M4 20h16M7 20V7l10-3v16M11 12h3M11 16h3M20 9h-3m1.5-1.5L20 9l-1.5 1.5"/></svg></div>
+              <div class="status-copy"><span>퇴근</span><strong id="checkout-state">대기 중</strong><small id="checkout-detail">20:00까지</small></div>
+              <span id="checkout-badge" class="status-badge waiting">대기</span>
+            </article>
+          </div>
+
+          <button id="exception-open" class="exception-button" type="button"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M12 7v5l3 2M18 3v5h5"/></svg> 오늘은 예외로 처리하기</button>
+
+          <button id="scan-button" class="scan-button" type="button">
+            <span class="scan-icon"><svg viewBox="0 0 24 24"><path d="M8 3H4a1 1 0 0 0-1 1v4M16 3h4a1 1 0 0 1 1 1v4M8 21H4a1 1 0 0 1-1-1v-4M16 21h4a1 1 0 0 0 1-1v-4M7 12h10"/></svg></span>
+            <span><strong>QR 스캔하기</strong><small>출근 · 퇴근 · 헬스장</small></span>
+            <svg class="arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <article class="month-card">
+            <div class="month-heading"><span id="home-month-label">이번 달 정산</span><span class="settlement-chip">월말 알림</span></div>
+            <div class="money-grid">
+              <div><span>잃은 돈</span><strong id="home-lost">0원</strong><small>월말에 기부</small></div>
+              <div class="earned"><span>번 돈</span><strong id="home-earned">0원</strong><small>헬스장 보상</small></div>
+            </div>
+          </article>
+        </section>
+
+        <section id="screen-history" class="screen">
+          <div class="section-title"><p>차곡차곡 모인 기록</p><h2>기록</h2></div>
+          <div class="month-picker">
+            <button id="history-prev" type="button" aria-label="이전 달">‹</button>
+            <strong id="history-month"></strong>
+            <button id="history-next" type="button" aria-label="다음 달">›</button>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </section>
+
+        <section id="screen-stats" class="screen">
+          <div class="section-title"><p>이번 달 나의 리듬</p><h2>통계</h2></div>
+          <div class="rate-grid">
+            <article class="rate-card"><span>출근 성공률</span><strong id="checkin-rate">0%</strong><div class="progress"><i id="checkin-progress"></i></div><small id="checkin-count">기록 없음</small></article>
+            <article class="rate-card coral"><span>퇴근 성공률</span><strong id="checkout-rate">0%</strong><div class="progress"><i id="checkout-progress"></i></div><small id="checkout-count">기록 없음</small></article>
+          </div>
+          <article class="gym-card">
+            <div class="gym-visual"><svg viewBox="0 0 24 24"><path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12"/></svg></div>
+            <div><span>헬스장</span><strong id="gym-count">0회</strong><small id="gym-earned-total">0원 벌었어요</small></div>
+          </article>
+          <div class="stats-money-grid"><article class="stats-settlement lost"><span>이번 달 잃은 돈</span><strong id="stats-lost">0원</strong><small>이 금액만큼 기부해요</small></article><article class="stats-settlement earned"><span>이번 달 번 돈</span><strong id="stats-earned">0원</strong><small>운동으로 벌었어요</small></article></div>
+        </section>
+
+        <section id="screen-settings" class="screen">
+          <div class="section-title"><p>내 생활에 맞게</p><h2>설정</h2></div>
+          <form id="settings-form">
+            <div class="settings-group">
+              <h3>마감 시간</h3>
+              <label><span><b>출근</b><small>이 시간을 넘기면 실패</small></span><input id="checkin-time" type="time" required /></label>
+              <label><span><b>퇴근</b><small>이 시간을 넘기면 실패</small></span><input id="checkout-time" type="time" required /></label>
+            </div>
+            <div class="settings-group">
+              <h3>금액</h3>
+              <label><span><b>출근 실패</b></span><span class="number-input"><input id="checkin-fine" type="number" min="0" step="1000" required /> 원</span></label>
+              <label><span><b>퇴근 실패</b></span><span class="number-input"><input id="checkout-fine" type="number" min="0" step="1000" required /> 원</span></label>
+              <label><span><b>헬스장 1회</b><small>하루 한 번 인정</small></span><span class="number-input"><input id="gym-credit" type="number" min="0" step="1000" required /> 원</span></label>
+            </div>
+            <div class="everyday-note"><strong>월요일부터 일요일까지, 매일</strong><span>쉬는 날은 홈에서 사유를 적고 예외 처리할 수 있어요.</span></div>
+            <button class="save-button" type="submit">설정 저장</button>
+          </form>
+          <button id="settings-qr-open" class="outline-button" type="button">출근 · 퇴근 · 헬스장 QR 보기</button>
+          <p class="privacy-note">모든 기록은 이 기기에만 저장돼요. · v1.2</p>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="주요 메뉴">
+        <button class="nav-button active" data-screen="home" type="button"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8M5 10v11h14V10M9 21v-7h6v7"/></svg><span>홈</span></button>
+        <button class="nav-button" data-screen="history" type="button"><svg viewBox="0 0 24 24"><path d="M5 4h14v17H5zM8 2v4m8-4v4M5 9h14M8 13h3m2 0h3m-8 4h3"/></svg><span>기록</span></button>
+        <button class="nav-button" data-screen="stats" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>통계</span></button>
+        <button class="nav-button" data-screen="settings" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1A8 8 0 0 0 15 6l-.3-2.5h-4L10.4 6a8 8 0 0 0-1.6 1L6.5 6 4.5 9.5 6.5 11a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a8 8 0 0 0 1.5 1l.3 2.5h4L15 18a8 8 0 0 0 1.6-1l2.4 1 2-3.5-2-1.5a7 7 0 0 0 0-1z"/></svg><span>설정</span></button>
+      </nav>
+    </div>
+
+    <dialog id="qr-dialog" class="qr-dialog">
+      <div class="dialog-head"><div><p>각 장소에 붙여두세요</p><h2>전용 QR 코드</h2></div><button id="qr-close" type="button" aria-label="닫기">×</button></div>
+      <p class="dialog-help">세 QR은 서로 다릅니다. 길게 눌러 이미지를 저장할 수 있어요.</p>
+      <div class="qr-tabs" role="tablist"><button class="active" data-qr="checkin" type="button">출근</button><button data-qr="checkout" type="button">퇴근</button><button data-qr="gym" type="button">헬스장</button></div>
+      <div class="qr-paper"><span id="qr-label">출근 QR</span><img id="qr-image" src="qrs/checkin.png" alt="출근 QR 코드" /><strong id="qr-caption">연구실 들어가는 곳</strong></div>
+      <button id="qr-share" class="save-button" type="button">QR 이미지 공유하기</button>
+    </dialog>
+
+    <dialog id="exception-dialog" class="exception-dialog">
+      <form id="exception-form">
+        <div class="dialog-head"><div><p>벌금 없이 쉬어가기</p><h2>오늘 예외 처리</h2></div><button id="exception-close" type="button" aria-label="닫기">×</button></div>
+        <p class="dialog-help">예외로 처리할 항목과 사유를 남겨주세요. 이미 생긴 벌금도 취소돼요.</p>
+        <div class="exception-types">
+          <label><input name="exception-type" value="checkin" type="checkbox" checked /><span>출근</span></label>
+          <label><input name="exception-type" value="checkout" type="checkbox" checked /><span>퇴근</span></label>
+        </div>
+        <label class="reason-label" for="exception-reason">사유</label>
+        <textarea id="exception-reason" maxlength="100" placeholder="예: 휴가, 출장, 병원" required></textarea>
+        <button class="save-button" type="submit">예외로 저장</button>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="logic.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
